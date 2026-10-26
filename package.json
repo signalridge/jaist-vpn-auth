@@ -1,0 +1,39 @@
+{
+  "name": "@signalridge/jaist-vpn-auth",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Obtain JAIST F5 VPN sessions through JAIST SSO",
+  "type": "module",
+  "license": "UNLICENSED",
+  "packageManager": "bun@1.4.4",
+  "engines": {
+    "bun": ">=1.4.4"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "bin": {
+    "jaist-vpn-auth": "./src/cli.ts"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "lint": "biome lint --error-on-warnings .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "check": "biome check --error-on-warnings . && tsc --noEmit && bun test"
+  },
+  "peerDependencies": {
+    "@signalridge/jaist-sso": "0.1.0"
+  },
+  "devDependencies": {
+    "@signalridge/jaist-sso": "file:../jaist-sso",
+    "@biomejs/biome": "2.6.3",
+    "@types/bun": "1.4.4",
+    "typescript": "7.0.2"
+  }
+}
