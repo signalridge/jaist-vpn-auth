@@ -1,10 +1,9 @@
 {
   "name": "@signalridge/jaist-vpn-auth",
   "version": "0.1.0",
-  "private": true,
   "description": "Obtain JAIST F5 VPN sessions through JAIST SSO",
   "type": "module",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "packageManager": "bun@1.4.4",
   "engines": {
     "bun": ">=1.4.4"
@@ -17,7 +16,9 @@
   },
   "files": [
     "src",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "lint": "biome lint --error-on-warnings .",
@@ -25,15 +26,34 @@
     "format:check": "biome format .",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "check": "biome check --error-on-warnings . && tsc --noEmit && bun test"
-  },
-  "peerDependencies": {
-    "@signalridge/jaist-sso": "0.1.0"
+    "check": "biome check --error-on-warnings . && tsc --noEmit && bun test",
+    "pack:check": "npm pack --dry-run --ignore-scripts"
   },
   "devDependencies": {
-    "@signalridge/jaist-sso": "file:../jaist-sso",
     "@biomejs/biome": "2.6.3",
     "@types/bun": "1.4.4",
     "typescript": "7.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/signalridge/jaist-vpn-auth.git"
+  },
+  "homepage": "https://github.com/signalridge/jaist-vpn-auth#readme",
+  "bugs": {
+    "url": "https://github.com/signalridge/jaist-vpn-auth/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "jaist",
+    "saml",
+    "sso",
+    "bun",
+    "vpn",
+    "f5"
+  ],
+  "dependencies": {
+    "@signalridge/jaist-sso": "0.1.0"
   }
 }

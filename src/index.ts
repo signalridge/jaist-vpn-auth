@@ -103,6 +103,7 @@ export async function completeVpn(
       "Unexpected VPN SAML callback",
     );
   }
+  const previousTicket = session.cookies.revision("F5_ST", `${target.origin}/`);
   const page = await session.request(
     {
       url: callback.url,
@@ -119,7 +120,11 @@ export async function completeVpn(
       "VPN gateway rejected the SAML callback",
     );
   const values = session.cookies.values(`${target.origin}/`);
-  if (!values.MRHSession || !values.F5_ST)
+  if (
+    !values.MRHSession ||
+    !values.F5_ST ||
+    session.cookies.revision("F5_ST", `${target.origin}/`) <= previousTicket
+  )
     throw new AuthenticationError(
       "rejected",
       "VPN gateway did not issue both session cookies",

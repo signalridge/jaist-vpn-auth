@@ -4,14 +4,13 @@
   "workspaces": {
     "": {
       "name": "@signalridge/jaist-vpn-auth",
+      "dependencies": {
+        "@signalridge/jaist-sso": "0.1.0",
+      },
       "devDependencies": {
         "@biomejs/biome": "2.6.3",
-        "@signalridge/jaist-sso": "file:../jaist-sso",
         "@types/bun": "1.4.4",
         "typescript": "7.0.2",
-      },
-      "peerDependencies": {
-        "@signalridge/jaist-sso": "0.1.0",
       },
     },
   },
@@ -38,7 +37,7 @@
 
     "@biomejs/cli-win32-x64": ["@biomejs/cli-win32-x64@2.6.3", "", { "os": "win32", "cpu": "x64" }, "sha512-GhtOPphBWlnCepqpNk/w5eGN5oGRCzL20EbAkL1XCIpyboeVC9R642noyT43l8LSenGS4qz9IL8sKPfwY37V/Q=="],
 
-    "@signalridge/jaist-sso": ["@signalridge/jaist-sso@file:../jaist-sso", { "devDependencies": { "@biomejs/biome": "2.6.3", "@types/bun": "1.4.4", "typescript": "7.0.2" }, "bin": { "jaist-sso": "./src/cli.ts" } }],
+    "@signalridge/jaist-sso": ["@signalridge/jaist-sso@0.1.0", "", { "bin": { "jaist-sso": "src/cli.ts" } }, "sha512-sJCULQ+LseTlo5YAtyyjBjqX+p5fJfnUs3v/Czn3F/RxMzrL4EkHSs4K2dRoeedIVeObOBzMLDiy3u4lQ+Av7Q=="],
 
     "@types/bun": ["@types/bun@1.4.4", "", { "dependencies": { "bun-types": "1.4.4" } }, "sha512-9wkRDXUXK124pEnAutE6n/l18j+i9GC5IAHK8TmX/2nlySETmky0OU6yL5U8pW1AoKh++AN9auDCr647BfurjQ=="],
 

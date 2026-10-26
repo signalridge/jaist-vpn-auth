@@ -4,42 +4,34 @@ Obtain JAIST F5 VPN gateway sessions using `@signalridge/jaist-sso`. This packag
 owns the gateway's SAML request/callback and returns `MRHSession` and `F5_ST`.
 It does **not** establish a tunnel, change routes, access gopass or run a daemon.
 
-The package runs directly on Bun 1.4.4 or later. Its only runtime peer is our
-`@signalridge/jaist-sso` package at version `0.1.0`; there are no other runtime
-libraries. Both packages are private and public npm publishing is disabled.
+The package runs directly on Bun 1.4.4 or later under the MIT license. Its only
+runtime dependency is `@signalridge/jaist-sso` at version `0.1.0`.
+
+## Installation
+
+```sh
+bun add @signalridge/jaist-vpn-auth
+bunx @signalridge/jaist-vpn-auth --help
+```
+
+The SSO dependency is installed normally; no sibling checkout, local link or
+separate installation is needed by consumers.
 
 ## Development
 
-Keep the two independent clones next to each other:
-
-```text
-signalridge/
-├── jaist-sso/
-└── jaist-vpn-auth/
-```
-
-The development dependency is `file:../jaist-sso`; the runtime contract is an exact
-versioned peer, so packed consumers do not depend on your local directory layout.
-
 ```sh
-cd ../jaist-sso
-bun install --frozen-lockfile
-bun run check
-cd ../jaist-vpn-auth
 bun install --frozen-lockfile
 bun run check
 bun run format
 ```
 
 `check` runs Biome lint/format/import checks, strict TypeScript checking and tests.
-Tests share the SSO clone's synthetic transport fixtures, generate test-only
-certificates using OpenSSL and perform no real JAIST login. CI checks Linux and
-macOS; private CI checkout needs an `SSO_READ_TOKEN` secret with read access to
-the SSO repository. No real authentication credentials belong in CI.
-
-For consumers installed from private Git URLs, install both packages at matching
-versions in the consuming Bun project. Do not rely on a public npm package with
-the same name. Version and lock that consumer's Git revisions before deployment.
+Tests use this repository's own synthetic transaction fixtures and generate
+in-memory test certificates using OpenSSL. They perform no real JAIST login.
+CI checks Linux and macOS without credential secrets or cross-repository checkout.
+To test an unpublished SSO change, register it with `bun link` in its checkout,
+then use `bun link --no-save @signalridge/jaist-sso` here; do not commit local links.
+The normal frozen install restores the published dependency.
 
 ## Library
 
@@ -106,7 +98,7 @@ are explicit secret accessors.
 ## Deployment boundary
 
 Keep sing-box API calls, selector monitoring, credential-store access, retry/pause
-policy, launchd and systemd in the consuming application/dotfiles. Desktop and
+policy, launchd and systemd in the consuming application. Desktop and
 headless use the same library; enable unattended login per host. Authentication
 traffic must reach the gateway, SSO and certificate IdP before the VPN is connected;
 preserve direct routing and working DNS for all three. Keep the same host and
@@ -116,3 +108,15 @@ All certificates, cookies and SAML state stay in memory. No credentials are read
 from environment variables or accepted as command-line arguments. Never commit
 real credentials or diagnostic HTTP dumps. Pause after authentication rejection
 instead of running an unattended failure loop.
+
+## Releases
+
+Run `bun run check` and `bun run pack:check` before creating a version tag.
+The tag must equal `v` followed by the manifest version. `publish.yml` validates
+the clean checkout, archive allowlist and npm integrity, publishes with npm Trusted
+Publishing/OIDC and provenance, then creates the GitHub release. A published
+version is reused only when its contents match; changed contents require a new
+version. The first publication of a new npm name requires an authenticated
+bootstrap, followed by a Trusted Publisher binding to this repository,
+`publish.yml`, and the `npm-publish` environment. No long-lived npm token is used
+by the workflow.

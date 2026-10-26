@@ -1,16 +1,12 @@
 import { expect, test } from "bun:test";
 import { AuthenticationError, HttpSession } from "@signalridge/jaist-sso";
 import {
-  fixture,
-  SERVICE,
-  syntheticPfx,
-} from "../../jaist-sso/test/fixture.ts";
-import {
   authenticateVpn,
   beginVpn,
   completeVpn,
   VpnSession,
 } from "../src/index.ts";
+import { fixture, SERVICE, syntheticPfx } from "./fixture.ts";
 
 const credentials = {
   username: async () => "synthetic-user",
@@ -70,6 +66,41 @@ test("initial MRHSession without F5_ST is never treated as success", async () =>
       },
     }),
   ).rejects.toMatchObject({ code: "rejected" });
+});
+
+test("old cookies cannot turn an unsuccessful callback into a successful login", async () => {
+  const session = new HttpSession({
+    serviceOrigin: SERVICE,
+    transport: async () => ({ status: 200, body: "<html>login</html>" }),
+  });
+  session.cookies.set("MRHSession=old; Path=/; Secure", SERVICE);
+  session.cookies.set("F5_ST=old; Path=/; Secure", SERVICE);
+  await expect(
+    completeVpn(session, {
+      url: `${SERVICE}/saml/acs`,
+      method: "POST",
+      fields: [["SAMLResponse", "synthetic"]],
+    }),
+  ).rejects.toMatchObject({ code: "rejected" });
+});
+
+test("a freshly reissued ticket is accepted even when the value is unchanged", async () => {
+  const session = new HttpSession({
+    serviceOrigin: SERVICE,
+    transport: async () => ({
+      status: 200,
+      body: "<html>portal</html>",
+      cookies: ["F5_ST=same-ticket; Path=/; Secure"],
+    }),
+  });
+  session.cookies.set("MRHSession=current; Path=/; Secure", SERVICE);
+  session.cookies.set("F5_ST=same-ticket; Path=/; Secure", SERVICE);
+  const result = await completeVpn(session, {
+    url: `${SERVICE}/saml/acs`,
+    method: "POST",
+    fields: [["SAMLResponse", "synthetic"]],
+  });
+  expect(result.cookies.F5_ST).toBe("same-ticket");
 });
 test("unsupported gateway is rejected before requesting credentials or making requests", async () => {
   let read = false;
