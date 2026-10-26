@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1
+
+### Patch Changes
+
+- 3f14368: Document installation and CLI usage from npm, headless credential pipes, and the Changesets release workflow.
+
 ## 0.1.0
 
 - Add JAIST F5 gateway authentication using `@signalridge/jaist-sso`.
