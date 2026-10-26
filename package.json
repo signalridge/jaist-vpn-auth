@@ -1,6 +1,6 @@
 {
   "name": "@signalridge/jaist-vpn-auth",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Obtain JAIST F5 VPN sessions through JAIST SSO",
   "type": "module",
   "license": "MIT",
