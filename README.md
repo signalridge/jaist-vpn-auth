@@ -2,14 +2,12 @@
 
 [![npm](https://img.shields.io/npm/v/@signalridge/jaist-vpn-auth)](https://www.npmjs.com/package/@signalridge/jaist-vpn-auth)
 [![CI](https://github.com/signalridge/jaist-vpn-auth/actions/workflows/ci.yml/badge.svg)](https://github.com/signalridge/jaist-vpn-auth/actions/workflows/ci.yml)
-[MIT](LICENSE)
 
 Obtain JAIST F5 VPN gateway sessions using `@signalridge/jaist-sso`. This package
 owns the gateway's SAML request/callback and returns `MRHSession` and `F5_ST`.
 It does **not** establish a tunnel, change routes, access gopass or run a daemon.
 
-The package runs directly on Bun 1.4.4 or later under the MIT license. Its only
-runtime dependency is `@signalridge/jaist-sso` at version `0.1.0`.
+Requires Bun 1.4.4 or later.
 
 ## Installation
 
@@ -17,9 +15,6 @@ runtime dependency is `@signalridge/jaist-sso` at version `0.1.0`.
 bun add @signalridge/jaist-vpn-auth
 bunx @signalridge/jaist-vpn-auth --help
 ```
-
-The SSO dependency is installed normally; no sibling checkout, local link or
-separate installation is needed by consumers.
 
 ## Library
 
@@ -114,24 +109,7 @@ instead of running an unattended failure loop.
 ```sh
 bun install --frozen-lockfile
 bun run check
-bun run format
 ```
 
-`check` runs Biome lint/format/import checks, strict TypeScript checking and tests.
-Tests use this repository's own synthetic transaction fixtures and generate
-in-memory test certificates using OpenSSL. They perform no real JAIST login.
-CI checks Linux and macOS without credential secrets or cross-repository checkout.
-To test an unpublished SSO change, register it with `bun link` in its checkout,
-then use `bun link --no-save @signalridge/jaist-sso` here; do not commit local links.
-The normal frozen install restores the published dependency.
-
-## Releases
-
-Published versions are available on [npm](https://www.npmjs.com/package/@signalridge/jaist-vpn-auth)
-and [GitHub Releases](https://github.com/signalridge/jaist-vpn-auth/releases).
-To release a change, run `bun run changeset` and commit the generated entry.
-On `main`, GitHub Actions opens or updates a **Version Packages** PR. Merging it
-publishes the reviewed package through npm Trusted Publishing/OIDC with
-provenance, then creates the GitHub release and attaches the npm tarball.
-No manual tag or long-lived npm token is needed. See [CONTRIBUTING.md](https://github.com/signalridge/jaist-vpn-auth/blob/main/CONTRIBUTING.md)
-for versioning, checks and recovery.
+See [CONTRIBUTING.md](https://github.com/signalridge/jaist-vpn-auth/blob/main/CONTRIBUTING.md)
+for development, testing and the Changesets release workflow.
