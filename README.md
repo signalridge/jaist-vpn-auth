@@ -1,5 +1,9 @@
 # jaist-vpn-auth
 
+[![npm](https://img.shields.io/npm/v/@signalridge/jaist-vpn-auth)](https://www.npmjs.com/package/@signalridge/jaist-vpn-auth)
+[![CI](https://github.com/signalridge/jaist-vpn-auth/actions/workflows/ci.yml/badge.svg)](https://github.com/signalridge/jaist-vpn-auth/actions/workflows/ci.yml)
+[MIT](LICENSE)
+
 Obtain JAIST F5 VPN gateway sessions using `@signalridge/jaist-sso`. This package
 owns the gateway's SAML request/callback and returns `MRHSession` and `F5_ST`.
 It does **not** establish a tunnel, change routes, access gopass or run a daemon.
@@ -16,22 +20,6 @@ bunx @signalridge/jaist-vpn-auth --help
 
 The SSO dependency is installed normally; no sibling checkout, local link or
 separate installation is needed by consumers.
-
-## Development
-
-```sh
-bun install --frozen-lockfile
-bun run check
-bun run format
-```
-
-`check` runs Biome lint/format/import checks, strict TypeScript checking and tests.
-Tests use this repository's own synthetic transaction fixtures and generate
-in-memory test certificates using OpenSSL. They perform no real JAIST login.
-CI checks Linux and macOS without credential secrets or cross-repository checkout.
-To test an unpublished SSO change, register it with `bun link` in its checkout,
-then use `bun link --no-save @signalridge/jaist-sso` here; do not commit local links.
-The normal frozen install restores the published dependency.
 
 ## Library
 
@@ -71,8 +59,8 @@ email OTP have synthetic end-to-end tests and need live validation.
 ## CLI
 
 ```sh
-bun src/cli.ts --method totp
-bun src/cli.ts --method email-otp
+bunx @signalridge/jaist-vpn-auth --method totp
+bunx @signalridge/jaist-vpn-auth --method email-otp
 ```
 
 The SSO package supplies terminal interaction and hides passwords/OTP. For
@@ -80,14 +68,26 @@ certificate/headless authentication, pass credential JSON through stdin or an
 inherited descriptor:
 
 ```sh
-your-credential-producer | bun src/cli.ts --method certificate --credentials-stdin
+your-credential-producer | bunx @signalridge/jaist-vpn-auth --method certificate --credentials-stdin
 ```
 
 For interactive OTP with piped username/password, keep stdin attached to the TTY
 and provide JSON through `--credentials-fd 3`. The JSON schema is described in the
-SSO README. The core does not assume gopass paths or access a browser/password
+[SSO README](https://github.com/signalridge/jaist-sso#cli-and-credential-pipes). The core does not assume gopass paths or access a browser/password
 store. Missing headless OTP input fails with `input-required`; authentication is
 not repeatedly retried. `--url` can select the allowed JAIST gateway alias.
+
+To pass a gateway session directly to a consuming VPN client:
+
+```sh
+your-credential-producer | bunx @signalridge/jaist-vpn-auth --method certificate --credentials-stdin --session-json | your-vpn-client-adapter
+```
+
+The producer emits credential JSON; the client adapter reads `{ gateway, cookies }`
+and submits it to the VPN client's authentication API. These adapters belong to
+the application and are not commands shipped by this package. The package can
+obtain a session on a headless host, while the consuming client owns when to
+request authentication and how to connect its tunnel.
 
 The default output is only a status line. `--session-json` explicitly writes
 `{ gateway, cookies }` to redirected stdout/a pipe, refusing an interactive terminal.
@@ -109,14 +109,29 @@ from environment variables or accepted as command-line arguments. Never commit
 real credentials or diagnostic HTTP dumps. Pause after authentication rejection
 instead of running an unattended failure loop.
 
+## Development
+
+```sh
+bun install --frozen-lockfile
+bun run check
+bun run format
+```
+
+`check` runs Biome lint/format/import checks, strict TypeScript checking and tests.
+Tests use this repository's own synthetic transaction fixtures and generate
+in-memory test certificates using OpenSSL. They perform no real JAIST login.
+CI checks Linux and macOS without credential secrets or cross-repository checkout.
+To test an unpublished SSO change, register it with `bun link` in its checkout,
+then use `bun link --no-save @signalridge/jaist-sso` here; do not commit local links.
+The normal frozen install restores the published dependency.
+
 ## Releases
 
-Run `bun run check` and `bun run pack:check` before creating a version tag.
-The tag must equal `v` followed by the manifest version. `publish.yml` validates
-the clean checkout, archive allowlist and npm integrity, publishes with npm Trusted
-Publishing/OIDC and provenance, then creates the GitHub release. A published
-version is reused only when its contents match; changed contents require a new
-version. The first publication of a new npm name requires an authenticated
-bootstrap, followed by a Trusted Publisher binding to this repository,
-`publish.yml`, and the `npm-publish` environment. No long-lived npm token is used
-by the workflow.
+Published versions are available on [npm](https://www.npmjs.com/package/@signalridge/jaist-vpn-auth)
+and [GitHub Releases](https://github.com/signalridge/jaist-vpn-auth/releases).
+To release a change, run `bun run changeset` and commit the generated entry.
+On `main`, GitHub Actions opens or updates a **Version Packages** PR. Merging it
+publishes the reviewed package through npm Trusted Publishing/OIDC with
+provenance, then creates the GitHub release and attaches the npm tarball.
+No manual tag or long-lived npm token is needed. See [CONTRIBUTING.md](https://github.com/signalridge/jaist-vpn-auth/blob/main/CONTRIBUTING.md)
+for versioning, checks and recovery.
